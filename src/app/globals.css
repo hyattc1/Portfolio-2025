@@ -86,8 +86,6 @@
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     cursor: pointer;
-    position: relative;
-    z-index: 1;
   }
   .title {
     @apply font-serif text-5xl tracking-wide decoration-border/75 decoration-2;
@@ -127,11 +125,7 @@
     z-index: 10;
   }
   
-  /* Ensure header is above other elements */
-  header {
-    position: relative;
-    z-index: 50;
-  }
+  
   
   /* Fix potential touch blocking */
   * {
