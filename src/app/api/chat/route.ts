@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { OpenAIStream, StreamingTextResponse } from "ai";
+import { formatStreamPart, OpenAIStream, StreamingTextResponse } from "ai";
 
 const openai = new OpenAI();
 
@@ -65,18 +65,89 @@ COPY THESE EXACT LINK FORMATS:
 - [LinkedIn](https://linkedin.com/in/connorhyatt)
 - [GitHub](https://github.com/hyattc1)`;
 
+const GREETINGS_ARR = [
+  "hello", "hey", "hi", "hi there", "hey there", "hello there",
+  "whats up", "what's up", "wassup", "wsup", "whats good", "what's good",
+  "sup", "yo", "howdy", "greetings", "hiya", "heya", "hey ya",
+  "ello", "hallo", "aloha", "hi hi", "hey hey", "heyyo", "heyy", "heyyy",
+  "hii", "hiiii", "helloo", "hellooo", "hullo", "helo",
+  "good morning", "good afternoon", "good evening", "good day",
+  "gm", "gday", "mornin", "morning", "evening",
+  "how are you", "how's it going", "hows it going", "how ya doing",
+  "how you doing", "how are ya", "how's things", "how goes it",
+  "hola", "bonjour", "ciao", "oi", "namaste", "salutations",
+  "help", "help me", "i need help", "can you help", "need help",
+  "what can you do", "what do you do", "what can you help with",
+  "who are you", "what are you", "are you real", "are you a bot",
+  "are you human", "whats your name", "what's your name",
+  "hey what's up", "hi how are you", "hello how are you",
+  "start", "begin", "go",
+];
+const GREETINGS = new Set(GREETINGS_ARR);
+const GREETING_FIRST_WORDS = new Set(
+  GREETINGS_ARR.map((g) => g.split(/\s/)[0]?.replace(/[^\w']/g, "") ?? g),
+);
+
+const GREETING_RESPONSE =
+  "Hi there! I'm Connor's portfolio chatbot. Feel free to ask about his work at [Lunon](https://www.lunon.ai), his [projects](https://connorhyatt.com/projects), or check out his [resume](https://connorhyatt.com/resume.pdf). How can I help you today?";
+
+function normalizeForGreeting(text: string): string {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/^[^\w']+|[^\w'\s]+$/g, "");
+}
+
+function isGreeting(text: string): boolean {
+  if (!text || typeof text !== "string") return false;
+  const n = normalizeForGreeting(text);
+  const first = (n.split(/\s/)[0] ?? "").replace(/[^\w']/g, "");
+  return (
+    GREETINGS.has(n) ||
+    GREETINGS_ARR.some((g) => n.startsWith(g + " ")) ||
+    GREETING_FIRST_WORDS.has(first)
+  );
+}
+
+function getMessageText(msg: unknown): string {
+  if (!msg || typeof msg !== "object") return "";
+  const m = msg as Record<string, unknown>;
+  const c = m.content;
+  if (typeof c === "string") return c;
+  if (Array.isArray(c)) {
+    const part = c.find((p) => (p as { type?: string })?.type === "text");
+    return (part as { text?: string })?.text ?? "";
+  }
+  return "";
+}
+
 export async function POST(req: Request) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown";
-  
+
   if (isRateLimited(ip)) {
     return Response.json(
       { error: "Too many requests. Please try again later." },
-      { status: 429 }
+      { status: 429 },
     );
   }
 
   try {
     const { messages } = await req.json();
+
+    const latestMsg = messages?.[messages.length - 1];
+    const latestMessage = latestMsg ? getMessageText(latestMsg) : "";
+
+    if (latestMessage && isGreeting(latestMessage)) {
+      const payload = formatStreamPart("text", GREETING_RESPONSE);
+      return new Response(payload, {
+        status: 200,
+        headers: { "Content-Type": "text/plain; charset=utf-8" },
+      });
+    }
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
