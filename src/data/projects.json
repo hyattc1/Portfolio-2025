@@ -40,14 +40,12 @@
     },
     {
       "name": "Propwise",
-      "description": "(Work in progress) Real-time risk analysis tool for real estate investors, designed to help them make informed decisions based on historical data and market trends.",
+      "description": "(Discontinued) Real-time risk analysis tool for real estate investors, designed to help them make informed decisions based on historical data and market trends.",
       "image": "/real-estate.jpg",
       "tags": [
         "JavaScript",
         "HTML",
-        "CSS",
-        "Library here",
-        "Insert the API"
+        "CSS"
       ],
       "links": [
         {
