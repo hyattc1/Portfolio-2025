@@ -4,11 +4,8 @@ interface ContactFormEmailProps {
   message: string;
 }
 
-const ContactFormEmail: React.FC<Readonly<ContactFormEmailProps>> = ({
-  name,
-  email,
-  message,
-}) => (
+function ContactFormEmail({ name, email, message }: ContactFormEmailProps) {
+  return (
   <div>
     <p>Hey {name},</p>
     <p>
@@ -21,8 +18,9 @@ const ContactFormEmail: React.FC<Readonly<ContactFormEmailProps>> = ({
     <p>{message}</p>
     <hr />
     <p>Thank you for your message, {name}! I will reply as soon as I can.</p>
-    <p>&copy; 2025 connorhyatt.com</p>
+    <p>&copy; 2026 connorhyatt.com</p>
   </div>
-);
+  );
+}
 
 export default ContactFormEmail;

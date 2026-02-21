@@ -68,14 +68,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-        <link rel="icon" type="image/png" href="/CHlogo.png?v=3" />
-        <link rel="shortcut icon" type="image/png" href="/CHlogo.png?v=3" />
-        <link rel="apple-touch-icon" href="/CHlogo.png?v=3" />
-      </head>
+    <html lang="en" suppressHydrationWarning>
       <body
+        suppressHydrationWarning
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
           inter.variable,
