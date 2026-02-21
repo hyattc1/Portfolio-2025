@@ -16,14 +16,11 @@ export default function ChatMessage({
   return (
     <div
       className={cn(
-        "mb-3 flex items-start min-w-0 justify-start",
+        "mb-3 flex w-full items-start min-w-0",
+        isBot ? "justify-start" : "justify-end",
       )}
     >
-      {isBot ? (
-        <Bot className="mr-2 size-5 shrink-0" />
-      ) : (
-        <div className="mr-2 size-5 shrink-0" />
-      )}
+      {isBot && <Bot className="mr-2 size-5 shrink-0" />}
       <div
         className={cn(
           "max-w-md rounded-lg px-4 py-2.5 text-sm leading-relaxed break-words min-w-0",
